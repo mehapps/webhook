@@ -21,7 +21,9 @@ tz = getenv("TIMEZONE", "America/New_York")
 app = FastAPI()
 
 async def query_contact(handle):
-    response = requests_get(f'{server_address}/api/v1/contact', params={'password': server_password}, headers={'Content-Type': 'application/json'})
+    response = requests_get(f'{server_address}/api/v1/contact',
+                            params={'password': server_password},
+                            headers={'Content-Type': 'application/json'})
 
     if response.status_code == 200:
         handle = sub(r"[ ()-]", "", handle)
@@ -75,11 +77,9 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
 
             sender_handle = message_data.handle.get("address")
 
-            # Check if the conversation document exists
             conversation = await messages_collection.find_one({"sender_handle": sender_handle})
 
             if not conversation:
-                # Create a new conversation document
                 await messages_collection.insert_one({
                     "sender_handle": sender_handle,
                     "messages": [
@@ -92,7 +92,6 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
                     ]
                 })
             else:
-                # Add the new message to the existing conversation
                 await messages_collection.update_one(
                     {"sender_handle": sender_handle},
                     {"$push": {"messages": {
@@ -117,53 +116,47 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
 
             sender_handle = message_data.handle.get("address")
 
-            # Check if the conversation document exists
             conversation = await messages_collection.find_one({"sender_handle": sender_handle})
 
             if not conversation:
-                # Create a new conversation document if it doesn't exist
                 await messages_collection.insert_one({
                     "sender_handle": sender_handle,
                     "messages": []
                 })
-                print("Collection created")
-                # No existing message to update since it's a new conversation
-                return {"status": "ignored"}
 
-            # Locate the specific message by its GUID in the messages array
-            message = next(
-                (msg for msg in conversation.get("messages", []) if msg["guid"] == message_guid),
-                None
-            )
+                return {"status": "ignored"}
+            
+            message = None
+            messages = conversation.get("messages")
+
+            if isinstance(messages, list):
+                for msg in messages:
+                    if msg.get("guid") == message_guid:
+                        message = msg
+                        break
 
             if not message:
                 return {"status": "ignored"}
 
-            if message_text is None:  # Message was unsent
-                # Convert unsent time to EST
-                unsent_time = date_unsent / 1000  # Convert milliseconds to seconds
+            if message_text is None:
+                unsent_time = date_unsent / 1000
                 unsent_utc = datetime.fromtimestamp(unsent_time, tz=timezone.utc)
                 est_timezone = pytz_timezone(tz)
                 unsent_est_time = unsent_utc.astimezone(est_timezone)
                 formatted_time = unsent_est_time.strftime("%I:%M %p")
 
-                # Retrieve the sender's name
                 contact_name = await query_contact(sender_handle)
-
-                # Use the original message text
                 original_text = message["text"]
 
-                # Send the notification
                 await send_chat(f'{contact_name} unsent "{original_text}" at {formatted_time}')
                 
-                # Update the message as unsent in the database
                 await messages_collection.update_one(
                     {"sender_handle": sender_handle, "messages.guid": message_guid},
                     {"$set": {
                         "messages.$.is_unsent": True
                     }}
                 )
-            else:  # Message was edited
+            else:
                 await messages_collection.update_one(
                     {"sender_handle": sender_handle, "messages.guid": message_guid},
                     {"$set": {
