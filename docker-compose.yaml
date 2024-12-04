@@ -10,5 +10,3 @@ services:
             - "1.1.1.1"
         restart: unless-stopped
         image: webhook
-        volumes:
-            - ./app/history.json:/code/history.json

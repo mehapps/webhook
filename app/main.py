@@ -1,6 +1,5 @@
-from json import load, loads, dump
-from requests import get, post
-from os import path
+from json import loads as load_json
+from requests import get as requests_get, post as requests_post
 from datetime import datetime, timezone
 from config.db import messages_collection
 from fastapi import FastAPI, Request, HTTPException
@@ -11,35 +10,28 @@ from models.change import ChangeData
 from models.custom import CustomData
 from models.uptime import UptimeKuma
 from os import getenv
+from re import sub
 
 server_address = getenv("BB_URL")
 maubot_address = f"{getenv('MAUBOT_URL')}/_matrix/maubot/plugin/maubotwebhook/send"
 server_password = getenv("BB_PASSWORD")
-HISTORY_PATH = "/code/history.json"
-AREA_CODE = "+1"
-
-print(server_address)
-print(maubot_address)
-print(server_password)
-
-if path.exists(HISTORY_PATH):
-    with open(HISTORY_PATH, 'r') as file:
-        history = load(file)
-else:
-    history = {}
+AREA_CODE = getenv("AREA_CODE", "+1")
+tz = getenv("TIMEZONE", "America/New_York")
 
 app = FastAPI()
 
 async def query_contact(handle):
-    response = get(f'{server_address}/api/v1/contact', params={'password': server_password}, headers={'Content-Type': 'application/json'})
+    response = requests_get(f'{server_address}/api/v1/contact', params={'password': server_password}, headers={'Content-Type': 'application/json'})
 
     if response.status_code == 200:
-        handle = handle.replace(" ", "").replace("(", "").replace(")", "").replace("-", "")
-        contacts = loads(response.text)
+        handle = sub(r"[ ()-]", "", handle)
+        contacts = load_json(response.text)
         contact = contacts.get("data")
         for i in contact:
             try:
-                phone_number = i.get("phoneNumbers")[0].get("address").replace(" ", "").replace("(", "").replace(")", "").replace("-", "")
+                phone_number = i.get("phoneNumbers")[0].get("address")
+                phone_number = sub(r"[ ()-]", "", phone_number)
+                
                 if len(phone_number) == 10:
                     phone_number = AREA_CODE + phone_number
                 if len(handle) == 10:
@@ -52,9 +44,9 @@ async def query_contact(handle):
                         pass
             except Exception:
                 pass
-        return ""
+        return "Someone"
     else:
-        return ""
+        return "Someone"
 
 
 async def send_chat(message):
@@ -62,7 +54,7 @@ async def send_chat(message):
     url = maubot_address
     headers = {"Content-Type": "application/json"}
     body = {"message": message}
-    post(url, headers=headers, json=body)
+    requests_post(url, headers=headers, json=body)
 
 
 @app.post("/bluebubbles-webhook")
@@ -151,7 +143,7 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
                 # Convert unsent time to EST
                 unsent_time = date_unsent / 1000  # Convert milliseconds to seconds
                 unsent_utc = datetime.fromtimestamp(unsent_time, tz=timezone.utc)
-                est_timezone = pytz_timezone("America/New_York")
+                est_timezone = pytz_timezone(tz)
                 unsent_est_time = unsent_utc.astimezone(est_timezone)
                 formatted_time = unsent_est_time.strftime("%I:%M %p")
 
