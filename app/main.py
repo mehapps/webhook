@@ -17,6 +17,7 @@ maubot_address = f"{getenv('MAUBOT_URL')}/_matrix/maubot/plugin/maubotwebhook/se
 server_password = getenv("BB_PASSWORD")
 AREA_CODE = getenv("AREA_CODE", "+1")
 tz = getenv("TIMEZONE", "America/New_York")
+MATRIX_ID = getenv("MATRIX_ID")
 
 app = FastAPI()
 
@@ -55,7 +56,10 @@ async def send_chat(message):
     print(message)
     url = maubot_address
     headers = {"Content-Type": "application/json"}
-    body = {"message": message}
+    body = {
+        "message": message,
+        "room_id": f"!{MATRIX_ID}"
+        }
     requests_post(url, headers=headers, json=body)
 
 

@@ -14,12 +14,12 @@ Alerts when Prowlarr proxies disconnect or are restored.
     - Alternatively, you can deploy the application manually. I will not be able to offer support for alternative deployment, but you can find instructions provided by FastAPI for [cloud deployment](https://fastapi.tiangolo.com/deployment/cloud/) or [running a server manually](https://fastapi.tiangolo.com/deployment/manually/).
 
 ## Installation
-1. Set up `maubotwebhook` to use the configuration below, replacing `!roomid:homeserver.tld` with your Matrix room ID.
+1. Set up `maubotwebhook` to use the configuration below.
 
     ```
     path: /send
     method: POST
-    room: '!roomid:homeserver.tld'
+    room: '{{ json.room_id }}'
     message: '{{ json.message }}'
     message_format: plaintext
     auth_type:
@@ -41,6 +41,7 @@ Alerts when Prowlarr proxies disconnect or are restored.
 4. Create a `.env` file with:
     - `ATLAS_URI` (this should be your MongoDB connection string, and should be URL encoded)
     - `MAUBOT_URL` (this should be your base URL)
+    - `MATRIX_ID` (this should be your Matrix room ID)
     - `BB_URL` (optional - this should be your BlueBubbles base URL, needed if you're using BlueBubbles)
     - `BB_PASSWORD` (optional - this should be your BlueBubbles password, needed if you're using BlueBubbles)
     - `AREA_CODE` (this is optional and will default to +1, only needed if you're using BlueBubbles)
@@ -50,6 +51,7 @@ Alerts when Prowlarr proxies disconnect or are restored.
     ```
     AREA_CODE=+1
     ATLAS_URI=mongodb+srv:/your_url
+    MATRIX_ID=room:homeserver.tld
     BB_PASSWORD=password
     BB_URL=http://127.0.0.1:1234
     MAUBOT_URL=http://127.0.0.1:29316
