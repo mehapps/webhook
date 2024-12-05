@@ -6,9 +6,9 @@ Receive notifications when Radarr downloads start or are completed.
 Alerts when Prowlarr proxies disconnect or are restored.
 
 ## Pre-requisites
-- A working [BlueBubbles Server](https://bluebubbles.app/downloads/server/)
 - A Maubot instance with the [Webhook plugin](https://github.com/jkhsjdhjs/maubot-webhook) installed
-- A MongoDB collection
+- A working [BlueBubbles Server](https://bluebubbles.app/downloads/server/) to track unsent messages (optional)
+- A MongoDB collection (optional, only needed for tracking unsent messages)
     - You can create a free MongoDB account and configure a shared instance, or self- host.
 -  Docker and Docker Compose for easier deployment
     - Alternatively, you can deploy the application manually. I will not be able to offer support for alternative deployment, but you can find instructions provided by FastAPI for [cloud deployment](https://fastapi.tiangolo.com/deployment/cloud/) or [running a server manually](https://fastapi.tiangolo.com/deployment/manually/).
@@ -40,11 +40,11 @@ Alerts when Prowlarr proxies disconnect or are restored.
 
 4. Create a `.env` file with:
     - `ATLAS_URI` (this should be your MongoDB connection string, and should be URL encoded)
-    - `BB_URL` (this should be your BlueBubbles base URL)
-    - `BB_PASSWORD` (this should be your BlueBubbles password)
     - `MAUBOT_URL` (this should be your base URL)
-    - `AREA_CODE` (this is optional and will default to +1)
-    - `TIMEZONE` (this is optional and will default to America/New_York)  
+    - `BB_URL` (optional - this should be your BlueBubbles base URL, needed if you're using BlueBubbles)
+    - `BB_PASSWORD` (optional - this should be your BlueBubbles password, needed if you're using BlueBubbles)
+    - `AREA_CODE` (this is optional and will default to +1, only needed if you're using BlueBubbles)
+    - `TIMEZONE` (this is optional and will default to America/New_York, only needed if you're using BlueBubbles)  
 
     Here is an example:
     ```
@@ -65,6 +65,11 @@ Alerts when Prowlarr proxies disconnect or are restored.
     ```
     docker compose --env-file .env up -d
     ```
+
+7. If you're using BlueBubbles, create a new Webhook in the `API & Webhooks` section of the BlueBubbles Server settings. Enter the server address and port, followed by `bluebubbles-webhook`. Then make sure to select `New Messages` and `Message Updates`
+
+    ![Server configuration](./assets/SCR-20241204-200837.png)
+
 
 ## Issues & Suggestions
 
