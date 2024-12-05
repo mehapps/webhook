@@ -14,7 +14,7 @@ Alerts when Prowlarr proxies disconnect or are restored.
     - Alternatively, you can deploy the application manually. I will not be able to offer support for alternative deployment, but you can find instructions provided by FastAPI for [cloud deployment](https://fastapi.tiangolo.com/deployment/cloud/) or [running a server manually](https://fastapi.tiangolo.com/deployment/manually/).
 
 ## Installation
-1. Configure `maubotwebhook` to use the below configuration, replacing `!roomid:homeserver.tld` with your Matrix room ID.
+1. Set up `maubotwebhook` to use the configuration below, replacing `!roomid:homeserver.tld` with your Matrix room ID.
 
     ```
     path: /send
