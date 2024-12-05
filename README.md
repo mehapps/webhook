@@ -14,7 +14,7 @@ Alerts when Prowlarr proxies disconnect or are restored.
     - Alternatively, you can deploy the application manually. I will not be able to offer support for alternative deployment, but you can find instructions provided by FastAPI for [cloud deployment](https://fastapi.tiangolo.com/deployment/cloud/) or [running a server manually](https://fastapi.tiangolo.com/deployment/manually/).
 
 ## Installation
-1. Set up `maubotwebhook` to use the configuration below.
+1. Set up `maubotwebhook` to use the configuration below. We'll leave authentication blank since we won't be exposing it.
 
     ```
     path: /send
@@ -68,7 +68,7 @@ Alerts when Prowlarr proxies disconnect or are restored.
     docker compose --env-file .env up -d
     ```
 
-7. If you're using BlueBubbles, create a new Webhook in the `API & Webhooks` section of the BlueBubbles Server settings. Enter the server address and port, followed by `bluebubbles-webhook`. Then make sure to select `New Messages` and `Message Updates`
+7. If you're using BlueBubbles, create a new Webhook in the `API & Webhooks` section of the BlueBubbles Server settings. Enter the server address and port, followed by `bluebubbles-webhook`. Then make sure to select `New Messages` and `Message Updates`.
 
     ![Server configuration](./assets/SCR-20241204-200837.png)
 

@@ -52,13 +52,14 @@ async def query_contact(handle):
         return "Someone"
 
 
-async def send_chat(message):
+async def send_chat(message, room_id):
     print(message)
     url = maubot_address
     headers = {"Content-Type": "application/json"}
     body = {
         "message": message,
         "room_id": f"!{MATRIX_ID}"
+        "room_id": f"!{room_id}"
         }
     requests_post(url, headers=headers, json=body)
 
@@ -152,7 +153,7 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
                 contact_name = await query_contact(sender_handle)
                 original_text = message["text"]
 
-                await send_chat(f'{contact_name} unsent "{original_text}" at {formatted_time}')
+                await send_chat(f'{contact_name} unsent "{original_text}" at {formatted_time}', MATRIX_ID)
                 
                 await messages_collection.update_one(
                     {"sender_handle": sender_handle, "messages.guid": message_guid},
@@ -182,31 +183,31 @@ async def handle_jellyseerr_webhook(request: Request, data: JellyseerrData):
     
     match data.notification_type:
         case "TEST_NOTIFICATION":
-            await send_chat(data.message)
+            await send_chat(data.message, MATRIX_ID)
             return {"status": "ok"}
         case "MEDIA_PENDING":
             username = data.request.get("requestedBy_username", "Someone")
             message = f"{username} requested {data.subject}, pending approval"
-            await send_chat(message)
+            await send_chat(message, MATRIX_ID)
             return {"status": "ok"}
         case "MEDIA_AUTO_APPROVED":
             username = data.request.get("requestedBy_username", "Someone")
             message = f"{username} requested {data.subject}"
-            await send_chat(message)
+            await send_chat(message, MATRIX_ID)
             return {"status": "ok"}
         case _:
             print(data)
-            await send_chat("Something just happened within Jellyseerr, check logs!")
+            await send_chat("Something just happened within Jellyseerr, check logs!", MATRIX_ID)
             return {"status": "unknown type"}
 
 @app.post("/radarr-webhook")
 async def radarr_webhook(request: Request, data: RadarrData):
     match data.eventType:
         case "Grab":
-            await send_chat(f"{data.movie.get('title')}, {data.movie.get('year')} started downloading in {data.release.get('quality')}")
+            await send_chat(f"{data.movie.get('title')}, {data.movie.get('year')} started downloading in {data.release.get('quality')}", MATRIX_ID)
         case _:
             print(data)
-            await send_chat("Something just happened within Radarr, check logs!")
+            await send_chat("Something just happened within Radarr, check logs!", MATRIX_ID)
             return {"status": "unknown type"}
     
 @app.post("/prowlarr-webhook")
@@ -214,26 +215,29 @@ async def prowlarr_webhook(request: Request, data: ProwlarrData):
     print(data)
     match data.eventType:
         case "Health":
-            await send_chat(f"Prowlarr: {data.message}")
+            await send_chat(f"Prowlarr: {data.message}", MATRIX_ID)
         case "HealthRestored":
-            await send_chat("Indexer status restored")
+            await send_chat("Indexer status restored", MATRIX_ID)
         case _:
-            await send_chat("Something just happened within Prowlarr, check logs!")
+            await send_chat("Something just happened within Prowlarr, check logs!", MATRIX_ID)
     
 @app.post("/sonarr-webhook")
 async def sonarr_webhook(request: Request, data: SonarrData):
     print(data)
-    await send_chat("Something just happened within Sonarr, check logs!")
+    await send_chat("Something just happened within Sonarr, check logs!", MATRIX_ID)
 
 @app.post("/change-webhook")
 async def change_webhook(data: ChangeData):
-    await send_chat(f"{data.message} changed!")
+    await send_chat(f"{data.message} changed!", MATRIX_ID)
 
 @app.post("/uptime-webhook")
 async def uptime_kuma(data: UptimeKuma):
     print(data)
-    await send_chat("Something just happened within Uptime Kuma, check logs!")
+    await send_chat("Something just happened within Uptime Kuma, check logs!", MATRIX_ID)
     
 @app.post("/custom-webhook")
 async def custom_webhook(data: CustomData):
-    print(data.message)
+    if data.room_id != None:
+        send_chat(data.message, data.room_id)
+    else:
+        send_chat(data.message, MATRIX_ID)
