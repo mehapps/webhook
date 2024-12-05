@@ -5,6 +5,9 @@ Get notified for pending or successful Jellyseerr requests.
 Receive notifications when Radarr downloads start or are completed.
 Alerts when Prowlarr proxies disconnect or are restored.
 
+
+Webhook is still in active development, but I use it every day!
+
 ## Pre-requisites
 - A Maubot instance with the [Webhook plugin](https://github.com/jkhsjdhjs/maubot-webhook) installed
 - A working [BlueBubbles Server](https://bluebubbles.app/downloads/server/) to track unsent messages (optional)
@@ -14,7 +17,7 @@ Alerts when Prowlarr proxies disconnect or are restored.
     - Alternatively, you can deploy the application manually. I will not be able to offer support for alternative deployment, but you can find instructions provided by FastAPI for [cloud deployment](https://fastapi.tiangolo.com/deployment/cloud/) or [running a server manually](https://fastapi.tiangolo.com/deployment/manually/).
 
 ## Installation
-1. Set up `maubotwebhook` to use the configuration below. We'll leave authentication blank since we won't be exposing it.
+1. Set up `maubotwebhook` to use the configuration below. We'll leave authentication blank since we won't be exposing the Maubot instance.
 
     ```
     path: /send
