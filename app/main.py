@@ -53,13 +53,12 @@ async def query_contact(handle):
 
 
 async def send_chat(message, room_id):
-    print(message)
     url = maubot_address
+    room = room_id.lstrip("!")
     headers = {"Content-Type": "application/json"}
     body = {
         "message": message,
-        "room_id": f"!{MATRIX_ID}"
-        "room_id": f"!{room_id}"
+        "room_id": f"!{room}"
         }
     requests_post(url, headers=headers, json=body)
 
