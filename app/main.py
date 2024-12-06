@@ -53,6 +53,9 @@ async def query_contact(handle):
 
 
 async def send_chat(message, room_id):
+    if room_id == None or ":" not in room_id or "." not in room_id:
+        raise HTTPException(status_code=400, detail="Invalid room_id")
+    
     url = maubot_address
     room = room_id.lstrip("!")
     headers = {"Content-Type": "application/json"}
