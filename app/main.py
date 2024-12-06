@@ -151,8 +151,13 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
 
                 contact_name = await query_contact(sender_handle)
                 original_text = message["text"]
-
-                await send_chat(f'{contact_name} unsent "{original_text}" at {formatted_time}', MATRIX_ID)
+                
+                unsent_message = f'{contact_name} unsent "{original_text}" at {formatted_time}'
+                
+                if '"' in original_text and "'" not in original_text:
+                    unsent_message = f"{contact_name} unsent '{original_text}' at {formatted_time}", MATRIX_ID
+                
+                await send_chat(unsent_message, MATRIX_ID)
                 
                 await messages_collection.update_one(
                     {"sender_handle": sender_handle, "messages.guid": message_guid},
