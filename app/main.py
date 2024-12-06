@@ -203,7 +203,15 @@ async def handle_jellyseerr_webhook(request: Request, data: JellyseerrData):
 async def radarr_webhook(request: Request, data: RadarrData):
     match data.eventType:
         case "Grab":
-            await send_chat(f"{data.movie.get('title')}, {data.movie.get('year')} started downloading in {data.release.get('quality')}", MATRIX_ID)
+            title = data.movie.title
+            year = data.movie.year
+            quality = data.release.quality
+            await send_chat(f"{title} ({year}) started downloading in {quality}", MATRIX_ID)
+        case "Download":
+            title = data.movie.title
+            year = data.movie.year
+            quality = data.movieFile.quality
+            await send_chat(f"{title} ({year}) is now available in {quality}", MATRIX_ID)
         case _:
             print(data)
             await send_chat("Something just happened within Radarr, check logs!", MATRIX_ID)
@@ -211,7 +219,6 @@ async def radarr_webhook(request: Request, data: RadarrData):
     
 @app.post("/prowlarr-webhook")
 async def prowlarr_webhook(request: Request, data: ProwlarrData):
-    print(data)
     match data.eventType:
         case "Health":
             await send_chat(f"Prowlarr: {data.message}", MATRIX_ID)
@@ -219,6 +226,7 @@ async def prowlarr_webhook(request: Request, data: ProwlarrData):
             await send_chat("Indexer status restored", MATRIX_ID)
         case _:
             await send_chat("Something just happened within Prowlarr, check logs!", MATRIX_ID)
+            print(data)
     
 @app.post("/sonarr-webhook")
 async def sonarr_webhook(request: Request, data: SonarrData):
