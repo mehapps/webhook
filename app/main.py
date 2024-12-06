@@ -219,6 +219,7 @@ async def radarr_webhook(request: Request, data: RadarrData):
             title = data.movie.title
             year = data.movie.year
             quality = data.release.quality
+
             await send_chat(f"{title} ({year}) started downloading in {quality}", MATRIX_ID)
         case "Download":
             title = data.movie.title
