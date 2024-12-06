@@ -9,8 +9,11 @@ from models.bluebubbles import BluebubblesData
 from models.change import ChangeData
 from models.custom import CustomData
 from models.uptime import UptimeKuma
+from dotenv import load_dotenv
 from os import getenv
 from re import sub
+
+load_dotenv()
 
 server_address = getenv("BB_URL", "http://127.0.0.1:1234")
 maubot_address = getenv("MAUBOT_URL", "http://127.0.0.1:29316/_matrix/maubot/plugin/maubotwebhook/send")
@@ -51,7 +54,6 @@ async def query_contact(handle):
     else:
         return "Someone"
 
-
 async def send_chat(message, room_id):
     if room_id == None or ":" not in room_id or "." not in room_id:
         raise HTTPException(status_code=400, detail="Invalid room_id")
@@ -64,7 +66,6 @@ async def send_chat(message, room_id):
         "room_id": f"!{room}"
         }
     requests_post(url, headers=headers, json=body)
-
 
 @app.post("/bluebubbles-webhook")
 async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
@@ -113,14 +114,14 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
 
         case "updated-message":
             message_data = data.data
-            message_guid = message_data.guid
-            message_text = message_data.text
-            date_unsent = message_data.dateEdited
             self_message = message_data.isFromMe
 
             if self_message:
                 return {"status": "ignored"}
-
+            
+            message_guid = message_data.guid
+            message_text = message_data.text
+            date_unsent = message_data.dateEdited
             sender_handle = message_data.handle.get("address")
 
             conversation = await messages_collection.find_one({"sender_handle": sender_handle})
@@ -182,7 +183,6 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
         case _:
             raise HTTPException(status_code=400, detail="Unknown event type")
 
-
 @app.post("/jellyseerr-webhook")
 async def handle_jellyseerr_webhook(request: Request, data: JellyseerrData):
     if request.headers.get("Content-Type") != "application/json":
@@ -240,7 +240,7 @@ async def radarr_webhook(data: RadarrData):
             message = "Something just happened within Radarr, check logs!"
             await send_chat(message, MATRIX_ID)
             return {"status": "unknown type"}
-    
+
 @app.post("/prowlarr-webhook")
 async def prowlarr_webhook(data: ProwlarrData):
     match data.eventType:
@@ -254,7 +254,7 @@ async def prowlarr_webhook(data: ProwlarrData):
             print(data)
             message = "Something just happened within Prowlarr, check logs!"
             await send_chat(message, MATRIX_ID)
-    
+
 @app.post("/sonarr-webhook")
 async def sonarr_webhook(data: SonarrData):
     print(data)
@@ -272,7 +272,7 @@ async def uptime_kuma(data: UptimeKuma):
     print(data)
     message = "Something just happened within Uptime Kuma, check logs!"
     await send_chat(message, MATRIX_ID)
-    
+
 @app.post("/custom-webhook")
 async def custom_webhook(data: CustomData):
     if data.room_id != None:
