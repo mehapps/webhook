@@ -3,14 +3,29 @@ from pydantic import BaseModel
 class SonarrData(BaseModel):
     class Config:
         extra = 'allow'
-        
+    
+class Media(BaseModel):
+    media_type: str
+    tmbdId: str | None = None
+    tvdb: str | None = None
+    status: str
+    status4k: str
+    
+class Request(BaseModel):
+    request_id: str
+    requestedBy_email: str | None = None
+    requestedBy_username: str | None = None
+    requestedBy_avatar: str | None = None
+    requestedBy_settings_discordId: str | None = None
+    requestedBy_settings_telegramChatId: str | None = None
+    
 class JellyseerrData(BaseModel):
     notification_type: str
     event: str
     subject: str
     message: str
-    media: dict | None = None
-    request: dict | None = None
+    media: Media | None = None
+    request: Request | None = None
     issue: dict | None = None
     comment: dict | None = None
         

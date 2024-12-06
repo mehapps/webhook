@@ -182,18 +182,31 @@ async def handle_jellyseerr_webhook(request: Request, data: JellyseerrData):
     
     match data.notification_type:
         case "TEST_NOTIFICATION":
-            await send_chat(data.message, MATRIX_ID)
+            message = data.message
+            await send_chat(message, MATRIX_ID)
             return {"status": "ok"}
         case "MEDIA_PENDING":
-            username = data.request.get("requestedBy_username", "Someone")
-            message = f"{username} requested {data.subject}, pending approval"
+            username = data.request.requestedBy_username
+            media = data.subject
+            
+            if username == None:
+                username = "Someone"
+                
+            message = f"{username} requested {media}, pending approval"
             await send_chat(message, MATRIX_ID)
             return {"status": "ok"}
         case "MEDIA_AUTO_APPROVED":
-            username = data.request.get("requestedBy_username", "Someone")
-            message = f"{username} requested {data.subject}"
+            username = data.request.requestedBy_username
+            media = data.subject
+            
+            if username == None:
+                username = "Someone"
+                
+            message = f"{username} requested {media}"
             await send_chat(message, MATRIX_ID)
             return {"status": "ok"}
+        case "MEDIA_AVAILABLE":
+            pass
         case _:
             print(data)
             await send_chat("Something just happened within Jellyseerr, check logs!", MATRIX_ID)
