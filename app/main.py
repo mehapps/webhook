@@ -218,7 +218,7 @@ async def handle_jellyseerr_webhook(request: Request, data: JellyseerrData):
             return {"status": "unknown type"}
 
 @app.post("/radarr-webhook")
-async def radarr_webhook(request: Request, data: RadarrData):
+async def radarr_webhook(data: RadarrData):
     match data.eventType:
         case "Grab":
             title = data.movie.title
@@ -239,7 +239,7 @@ async def radarr_webhook(request: Request, data: RadarrData):
             return {"status": "unknown type"}
     
 @app.post("/prowlarr-webhook")
-async def prowlarr_webhook(request: Request, data: ProwlarrData):
+async def prowlarr_webhook(data: ProwlarrData):
     match data.eventType:
         case "Health":
             message = f"Prowlarr: {data.message}"
@@ -253,7 +253,7 @@ async def prowlarr_webhook(request: Request, data: ProwlarrData):
             await send_chat(message, MATRIX_ID)
     
 @app.post("/sonarr-webhook")
-async def sonarr_webhook(request: Request, data: SonarrData):
+async def sonarr_webhook(data: SonarrData):
     print(data)
     message = "Something just happened within Sonarr, check logs!"
     await send_chat(message, MATRIX_ID)
