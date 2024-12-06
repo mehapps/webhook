@@ -16,7 +16,7 @@ Webhook is still in active development, but I use it every day!
 -  Docker and Docker Compose for easier deployment
     - Alternatively, you can deploy the application manually. I will not be able to offer support for alternative deployment, but you can find instructions provided by FastAPI for [cloud deployment](https://fastapi.tiangolo.com/deployment/cloud/) or [running a server manually](https://fastapi.tiangolo.com/deployment/manually/).
     - Python 3.12 is required for manual deployment.
-
+- If you use Coolify and link this repository, you can skip steps 2, 3, 5, and 6. It will also automatically update. This is the option I recommend the most!
 ## Installation
 1. Set up `maubotwebhook` to use the configuration below. We'll leave authentication blank since we won't be exposing the Maubot instance.
 
