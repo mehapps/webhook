@@ -79,4 +79,5 @@ Webhook is still in active development, but I use it every day!
 
 ## Issues & Suggestions
 
-If you have any issues running the server or have any suggestions, feel free to create an issue and I'll do my best to help you! 
+If you have any issues running the server or have any suggestions, feel free to create an issue and I'll do my best to help you!
+I especially want to know what services you'd like to use to receive notifications, so please open an issue/feature request for that!
