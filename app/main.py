@@ -219,42 +219,51 @@ async def radarr_webhook(request: Request, data: RadarrData):
             title = data.movie.title
             year = data.movie.year
             quality = data.release.quality
-
-            await send_chat(f"{title} ({year}) started downloading in {quality}", MATRIX_ID)
+            message = f"{title} ({year}) started downloading in {quality}"
+            await send_chat(message, MATRIX_ID)
         case "Download":
             title = data.movie.title
             year = data.movie.year
             quality = data.movieFile.quality
-            await send_chat(f"{title} ({year}) is now available in {quality}", MATRIX_ID)
+            message = f"{title} ({year}) is now available in {quality}"
+            await send_chat(message, MATRIX_ID)
         case _:
             print(data)
-            await send_chat("Something just happened within Radarr, check logs!", MATRIX_ID)
+            message = "Something just happened within Radarr, check logs!"
+            await send_chat(message, MATRIX_ID)
             return {"status": "unknown type"}
     
 @app.post("/prowlarr-webhook")
 async def prowlarr_webhook(request: Request, data: ProwlarrData):
     match data.eventType:
         case "Health":
-            await send_chat(f"Prowlarr: {data.message}", MATRIX_ID)
+            message = f"Prowlarr: {data.message}"
+            await send_chat(message, MATRIX_ID)
         case "HealthRestored":
-            await send_chat("Indexer status restored", MATRIX_ID)
+            message = "Prowlarr indexer status restored"
+            await send_chat(message, MATRIX_ID)
         case _:
-            await send_chat("Something just happened within Prowlarr, check logs!", MATRIX_ID)
             print(data)
+            message = "Something just happened within Prowlarr, check logs!"
+            await send_chat(message, MATRIX_ID)
     
 @app.post("/sonarr-webhook")
 async def sonarr_webhook(request: Request, data: SonarrData):
     print(data)
-    await send_chat("Something just happened within Sonarr, check logs!", MATRIX_ID)
+    message = "Something just happened within Sonarr, check logs!"
+    await send_chat(message, MATRIX_ID)
 
 @app.post("/change-webhook")
 async def change_webhook(data: ChangeData):
-    await send_chat(f"{data.message} changed!", MATRIX_ID)
+    changes = data.message
+    message = f"{data.message} changed!"
+    await send_chat(message, MATRIX_ID)
 
 @app.post("/uptime-webhook")
 async def uptime_kuma(data: UptimeKuma):
     print(data)
-    await send_chat("Something just happened within Uptime Kuma, check logs!", MATRIX_ID)
+    message = "Something just happened within Uptime Kuma, check logs!"
+    await send_chat(message, MATRIX_ID)
     
 @app.post("/custom-webhook")
 async def custom_webhook(data: CustomData):
