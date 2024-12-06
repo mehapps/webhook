@@ -12,9 +12,9 @@ from models.uptime import UptimeKuma
 from os import getenv
 from re import sub
 
-server_address = getenv("BB_URL")
-maubot_address = f"{getenv('MAUBOT_URL')}/_matrix/maubot/plugin/maubotwebhook/send"
-server_password = getenv("BB_PASSWORD")
+server_address = getenv("BB_URL", "http://127.0.0.1:1234")
+maubot_address = getenv("MAUBOT_URL", "http://127.0.0.1:29316/_matrix/maubot/plugin/maubotwebhook/send")
+server_password = getenv("BB_PASSWORD", "password")
 AREA_CODE = getenv("AREA_CODE", "+1")
 tz = getenv("TIMEZONE", "America/New_York")
 MATRIX_ID = getenv("MATRIX_ID")
