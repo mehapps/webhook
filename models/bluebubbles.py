@@ -48,3 +48,7 @@ class Data(BaseModel):
     payloadData: dict | None = None
     dateRetracted: int | None = None
     partCount: int
+
+class BluebubblesData(BaseModel):
+    type: str
+    data: Data
