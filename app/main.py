@@ -83,7 +83,7 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
             if self_message:
                 return {"status": "ignored"}
 
-            sender_handle = message_data.handle.get("address")
+            sender_handle = message_data.handle.address
 
             conversation = await messages_collection.find_one({"sender_handle": sender_handle})
 
@@ -122,7 +122,7 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
             message_guid = message_data.guid
             message_text = message_data.text
             date_unsent = message_data.dateEdited
-            sender_handle = message_data.handle.get("address")
+            sender_handle = message_data.handle.address
 
             conversation = await messages_collection.find_one({"sender_handle": sender_handle})
 
