@@ -6,6 +6,8 @@ class Handle(BaseModel):
     service: str
     uncanonicalizedId: str
     country: str
+    class Config:
+        extra = 'allow'
     
 class Data(BaseModel):
     guid: str
@@ -14,6 +16,8 @@ class Data(BaseModel):
     dateEdited: int | None = None
     isFromMe: bool
     handle: Handle
+    class Config:
+        extra = 'allow'
 
 class BluebubblesData(BaseModel):
     type: str
