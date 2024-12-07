@@ -6,6 +6,8 @@ class Handle(BaseModel):
     service: str
     uncanonicalizedId: str
     country: str
+    class Config:
+        extra = 'allow'
 
 class Chats(BaseModel):
     originalROWID: int
@@ -14,6 +16,8 @@ class Chats(BaseModel):
     chatIdentifier: str
     isArchived: bool
     displayName: str | None = None
+    class Config:
+        extra = 'allow'
 
 class Data(BaseModel):
     guid: str
@@ -48,7 +52,11 @@ class Data(BaseModel):
     payloadData: dict | None = None
     dateRetracted: int | None = None
     partCount: int
+    class Config:
+        extra = 'allow'
 
 class BluebubblesData(BaseModel):
     type: str
     data: Data
+    class Config:
+        extra = 'allow'
