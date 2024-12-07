@@ -86,8 +86,11 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
             sender_handle = message_data.handle.address
 
             conversation = await messages_collection.find_one({"sender_handle": sender_handle})
+            
             if "chat" in message_data.chats[0].chatIdentifier:
                 group_chat = True
+            else:
+                group_chat = False
 
             if not conversation:
                 await messages_collection.insert_one({
