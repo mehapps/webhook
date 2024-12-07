@@ -71,7 +71,7 @@ async def send_chat(message, room_id):
 async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
     if request.headers.get("Content-Type") != "application/json":
         raise HTTPException(status_code=400, detail="Invalid Content-Type")
-
+    print(data)
     match data.type:
         case 'new-message':
             message_data = data.data
@@ -281,4 +281,3 @@ async def custom_webhook(data: CustomData):
         send_chat(data.message, data.room_id)
     else:
         send_chat(data.message, MATRIX_ID)
-
