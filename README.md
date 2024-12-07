@@ -58,7 +58,7 @@ Webhook is still in active development, but I use it every day!
     MATRIX_ID=room:homeserver.tld
     BB_PASSWORD=password
     BB_URL=http://127.0.0.1:1234
-    MAUBOT_URL=http://127.0.0.1:29316
+    MAUBOT_URL=http://127.0.0.1:29316/_matrix/maubot/plugin/maubotwebhook/send
     TIMEZONE=America/New_York
     ```
 

@@ -15,18 +15,18 @@ from re import sub
 
 load_dotenv()
 
-server_address = getenv("BB_URL", "http://127.0.0.1:1234")
-maubot_address = getenv("MAUBOT_URL", "http://127.0.0.1:29316/_matrix/maubot/plugin/maubotwebhook/send")
-server_password = getenv("BB_PASSWORD", "password")
+BB_ADDRESS = getenv("BB_URL", "http://127.0.0.1:1234")
+BB_PASSWORD = getenv("BB_PASSWORD", "password")
+MAUBOT_ADDRESS = getenv("MAUBOT_URL", "http://127.0.0.1:29316/_matrix/maubot/plugin/maubotwebhook/send")
 AREA_CODE = getenv("AREA_CODE", "+1")
-tz = getenv("TIMEZONE", "America/New_York")
+TIMEZONE = getenv("TIMEZONE", "America/New_York")
 MATRIX_ID = getenv("MATRIX_ID")
 
 app = FastAPI()
 
 async def query_contact(handle):
-    response = requests_get(f'{server_address}/api/v1/contact',
-                            params={'password': server_password},
+    response = requests_get(f'{BB_ADDRESS}/api/v1/contact',
+                            params={'password': BB_PASSWORD},
                             headers={'Content-Type': 'application/json'})
 
     if response.status_code == 200:
@@ -58,7 +58,7 @@ async def send_chat(message, room_id):
     if room_id == None or ":" not in room_id or "." not in room_id:
         raise HTTPException(status_code=400, detail="Invalid room_id")
     
-    url = maubot_address
+    url = MAUBOT_ADDRESS
     room = room_id.lstrip("!")
     headers = {"Content-Type": "application/json"}
     body = {
@@ -149,7 +149,7 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
             if message_text is None:
                 unsent_time = date_unsent / 1000
                 unsent_utc = datetime.fromtimestamp(unsent_time, tz=timezone.utc)
-                est_timezone = pytz_timezone(tz)
+                est_timezone = pytz_timezone(TIMEZONE)
                 unsent_est_time = unsent_utc.astimezone(est_timezone)
                 formatted_time = unsent_est_time.strftime("%I:%M %p")
 
@@ -214,7 +214,9 @@ async def handle_jellyseerr_webhook(request: Request, data: JellyseerrData):
             await send_chat(message, MATRIX_ID)
             return {"status": "ok"}
         case "MEDIA_AVAILABLE":
-            pass
+            media = data.subject
+            message = f"{media} is now available"
+            await send_chat(message, MATRIX_ID)
         case _:
             print(data)
             await send_chat("Something just happened within Jellyseerr, check logs!", MATRIX_ID)
@@ -263,8 +265,8 @@ async def sonarr_webhook(data: SonarrData):
 
 @app.post("/change-webhook")
 async def change_webhook(data: ChangeData):
-    changes = data.message
-    message = f"{data.message} changed!"
+    changed_site = data.message
+    message = f"{changed_site} changed!"
     await send_chat(message, MATRIX_ID)
 
 @app.post("/uptime-webhook")
@@ -279,3 +281,4 @@ async def custom_webhook(data: CustomData):
         send_chat(data.message, data.room_id)
     else:
         send_chat(data.message, MATRIX_ID)
+
