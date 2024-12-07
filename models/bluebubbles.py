@@ -1,23 +1,19 @@
 from pydantic import BaseModel
 
 class Handle(BaseModel):
-    originalROWID: int
-    address: str
-    service: str
-    uncanonicalizedId: str
-    country: str
-    class Config:
-        extra = 'allow'
+    originalROWID: int | None = None
+    address: str | None = None
+    service: str | None = None
+    uncanonicalizedId: str | None = None
+    country: str | None = None
 
 class Chats(BaseModel):
-    originalROWID: int
-    guid: str
-    style: int
-    chatIdentifier: str
-    isArchived: bool
+    originalROWID: int | None = None
+    guid: str | None = None
+    style: int | None = None
+    chatIdentifier: str | None = None
+    isArchived: bool | None = None
     displayName: str | None = None
-    class Config:
-        extra = 'allow'
 
 class Data(BaseModel):
     guid: str
@@ -26,37 +22,33 @@ class Data(BaseModel):
     dateEdited: int | None = None
     isFromMe: bool
     handle: Handle
-    originalROWID: int
+    originalROWID: int | None = None
     attributedBody: str | None = None
-    handleId: int
-    otherHandle: int
+    handleId: int | None = None
+    otherHandle: int | None = None
     attachments: list | None = None
     subject: str | None = None
-    error: int
+    error: int | None = None
     dateRead: int | None = None
     dateDelivered: int | None = None
-    isDelivered: bool
-    hasDdResults: bool
-    isArchived: bool
-    itemType: int
+    isDelivered: bool | None = None
+    hasDdResults: bool | None = None
+    isArchived: bool | None = None
+    itemType: int | None = None
     groupTitle: str | None = None
-    groupActionType: int
+    groupActionType: int | None = None
     balloonBundleId: str | None = None
     associatedMessageGuid: str | None = None
     associatedMessageType: int | None = None
     expressiveSendStyleId: str | None = None
     threadOriginatorGuid: str | None = None
-    hasPayloadData: bool
+    hasPayloadData: bool | None = None
     chats: list[Chats] | None = None
     messageSummaryInfo: dict | None = None
     payloadData: dict | None = None
     dateRetracted: int | None = None
-    partCount: int
-    class Config:
-        extra = 'allow'
+    partCount: int | None = None
 
 class BluebubblesData(BaseModel):
     type: str
     data: Data
-    class Config:
-        extra = 'allow'
