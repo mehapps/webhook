@@ -18,4 +18,5 @@ class Data(BaseModel):
 class BluebubblesData(BaseModel):
     type: str
     data: Data
-    
+    class Config:
+        extra = 'allow'
