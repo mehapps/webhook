@@ -72,7 +72,7 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
     if request.headers.get("Content-Type") != "application/json":
         raise HTTPException(status_code=400, detail="Invalid Content-Type")
 
-    match data.get("type"):
+    match data.type:
         case 'new-message':
             message_data = data.data
             message_guid = message_data.get("guid")
