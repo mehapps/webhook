@@ -16,12 +16,12 @@ class Chats(BaseModel):
     displayName: str | None = None
 
 class Data(BaseModel):
-    guid: str
+    guid: str | None = None
     text: str | None = None
     dateCreated: int | None = None
     dateEdited: int | None = None
-    isFromMe: bool
-    handle: Handle
+    isFromMe: bool | None = None
+    handle: Handle | None = None
     originalROWID: int | None = None
     attributedBody: str | None = None
     handleId: int | None = None
@@ -50,5 +50,5 @@ class Data(BaseModel):
     partCount: int | None = None
 
 class BluebubblesData(BaseModel):
-    type: str
-    data: Data
+    type: str | None = None
+    data: Data | None = None
