@@ -1,54 +1,59 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from typing import List, Optional, Dict
+
 
 class Handle(BaseModel):
-    originalROWID: int | None = None
-    address: str | None = None
-    service: str | None = None
-    uncanonicalizedId: str | None = None
-    country: str | None = None
+    originalROWID: Optional[int] = None
+    address: Optional[str] = None
+    service: Optional[str] = None
+    uncanonicalizedId: Optional[str] = None
+    country: Optional[str] = None
+
 
 class Chats(BaseModel):
-    originalROWID: int | None = None
-    guid: str | None = None
-    style: int | None = None
-    chatIdentifier: str | None = None
-    isArchived: bool | None = None
-    displayName: str | None = None
+    originalROWID: Optional[int] = None
+    guid: Optional[str] = None
+    style: Optional[int] = None
+    chatIdentifier: Optional[str] = None
+    isArchived: Optional[bool] = None
+    displayName: Optional[str] = None
+
 
 class Data(BaseModel):
-    guid: str | None = None
-    text: str | None = None
-    dateCreated: int | None = None
-    dateEdited: int | None = None
-    isFromMe: bool | None = None
-    handle: Handle | None = None
-    originalROWID: int | None = None
-    attributedBody: str | None = None
-    handleId: int | None = None
-    otherHandle: int | None = None
-    attachments: list | None = None
-    subject: str | None = None
-    error: int | None = None
-    dateRead: int | None = None
-    dateDelivered: int | None = None
-    isDelivered: bool | None = None
-    hasDdResults: bool | None = None
-    isArchived: bool | None = None
-    itemType: int | None = None
-    groupTitle: str | None = None
-    groupActionType: int | None = None
-    balloonBundleId: str | None = None
-    associatedMessageGuid: str | None = None
-    associatedMessageType: int | None = None
-    expressiveSendStyleId: str | None = None
-    threadOriginatorGuid: str | None = None
-    hasPayloadData: bool | None = None
-    chats: list[Chats] | None = None
-    messageSummaryInfo: dict | None = None
-    payloadData: dict | None = None
-    dateRetracted: int | None = None
-    partCount: int | None = None
+    guid: Optional[str] = None
+    text: Optional[str] = None
+    dateCreated: Optional[int] = None
+    dateEdited: Optional[int] = None
+    isFromMe: Optional[bool] = None
+    handle: Optional[Handle] = None
+    originalROWID: Optional[int] = None
+    attributedBody: Optional[str] = None
+    handleId: Optional[int] = None
+    otherHandle: Optional[int] = None
+    attachments: Optional[List[Dict]] = None
+    subject: Optional[str] = None
+    error: Optional[int] = None
+    dateRead: Optional[int] = None
+    dateDelivered: Optional[int] = None
+    isDelivered: Optional[bool] = None
+    hasDdResults: Optional[bool] = None
+    isArchived: Optional[bool] = None
+    itemType: Optional[int] = None
+    groupTitle: Optional[str] = None
+    groupActionType: Optional[int] = None
+    balloonBundleId: Optional[str] = None
+    associatedMessageGuid: Optional[str] = None
+    associatedMessageType: Optional[int] = None
+    expressiveSendStyleId: Optional[str] = None
+    threadOriginatorGuid: Optional[str] = None
+    hasPayloadData: Optional[bool] = None
+    chats: Optional[List[Chats]] = None
+    messageSummaryInfo: Optional[Dict] = None
+    payloadData: Optional[Dict] = None
+    dateRetracted: Optional[int] = None
+    partCount: Optional[int] = None
+
 
 class BluebubblesData(BaseModel):
-    type: str | None = None
-    data: Data | None = None
+    type: Optional[str] = None
+    data: Optional[Data] = None
