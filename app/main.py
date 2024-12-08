@@ -87,7 +87,7 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
 
             conversation = await messages_collection.find_one({"sender_handle": sender_handle})
             
-            if message_data.get("chats") is not None and "chat" in message_data.get("chats")[0].get("chatIdentifier"):
+            if message_data.chats is not None and "chat" in message_data.chats[0].get("chatIdentifier"):
                 group_chat = True
             else:
                 group_chat = False

@@ -7,6 +7,7 @@ class MessageData(BaseModel):
     dateEdited: int | None = None
     isFromMe: bool
     handle: dict
+    chats: list | None = None
 
 class BluebubblesData(BaseModel):
     type: str
