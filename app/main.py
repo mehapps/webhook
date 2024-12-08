@@ -12,6 +12,7 @@ from models.uptime import UptimeKuma
 from dotenv import load_dotenv
 from os import getenv
 from re import sub
+from geopy.distance import geodesic
 
 load_dotenv()
 
@@ -75,19 +76,19 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
     match data.type:
         case 'new-message':
             message_data = data.data
-            message_guid = message_data.guid
-            message_text = message_data.text
-            date_created = message_data.dateCreated
-            self_message = message_data.isFromMe
+            message_guid = message_data.get("guid")
+            message_text = message_data.get("guid")
+            date_created = message_data.get("guid")
+            self_message = message_data.get("guid")
 
             if self_message:
                 return {"status": "ignored"}
 
-            sender_handle = message_data.handle.get("address")
+            sender_handle = message_data.get("handle").get("address")
 
             conversation = await messages_collection.find_one({"sender_handle": sender_handle})
             
-            if message_data.chats is not None and "chat" in message_data.chats[0].get("chatIdentifier"):
+            if message_data.get("chats") is not None and "chat" in message_data["chats"][0].get("chatIdentifier"):
                 group_chat = True
             else:
                 group_chat = False
@@ -121,15 +122,15 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
 
         case "updated-message":
             message_data = data.data
-            self_message = message_data.isFromMe
+            self_message = message_data.get("isFromMe")
 
             if self_message:
                 return {"status": "ignored"}
             
-            message_guid = message_data.guid
-            message_text = message_data.text
-            date_unsent = message_data.dateEdited
-            sender_handle = message_data.handle.get("address")
+            message_guid = message_data.get("guid")
+            message_text = message_data.get("text")
+            date_unsent = message_data.get("dateEdited")
+            sender_handle = message_data.get("handle").get("address")
 
             conversation = await messages_collection.find_one({"sender_handle": sender_handle})
 
@@ -185,6 +186,34 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
                     }}
                 )
 
+            return {"status": "ok"}
+
+        case "new-findmy-location":
+            handle = data.data.get("handle")
+            past_location = await locations_collection.find_one({"handle": handle},
+                                                                {"_id": 1})
+            last_updated = data.data.get("last_updated")
+            coordinates = data.data.get("coordinates")
+            latitude = coordinates[0]
+            longitude = coordinates[1]
+
+            if past_location is None:
+                document = {
+                    "handle": handle,
+                    "location": [latitude, longitude],
+                    "last_updated": last_updated
+                    }
+                await locations_collection.insert_one(document)
+            else:
+                await locations_collection.update_one(
+                    {"handle": handle},
+                    {"$set": {
+                        "location": [latitude, longitude],
+                        "last_updated": last_updated
+                        }
+                     }
+                    )
+                
             return {"status": "ok"}
 
         case _:
@@ -346,4 +375,41 @@ async def location_request(handle: str):
         "latitude": latitude,
         "longitude": longitude,
         "last_updated": last_updated
+    }
+    
+#distance between person and me
+@app.get("/bluebubbles-distance")
+async def person_distance(handle: str = "", id: str = ""):
+    handle_location = await location_request(handle)
+    if handle_location is None:
+        raise HTTPException(status_code=400, detail="Invalid handle")
+    
+    handle_latitude = handle_location.get("latitude")
+    handle_longitude = handle_location.get("longitude")
+    handle_coordinates = (handle_latitude, handle_longitude)
+    
+    url = f"{BB_ADDRESS}/api/v1/icloud/findmy/devices?password={BB_PASSWORD}"
+    request = requests_get(url)
+    json_data = request.json()
+    data = json_data.get("data")
+
+    for device in data:
+        name = device.get("name")
+        if name == id:
+            location = device.get("location")
+            latitude = location.get("latitude")
+            longitude = location.get("longitude")
+        
+    if latitude is None or longitude is None:
+        raise HTTPException(status_code=400, detail="Invalid device")
+    
+    my_coordinates = (latitude, longitude)
+                
+    distance = geodesic(handle_coordinates, my_coordinates)
+    distance_km = distance.km
+    distance_miles = distance.miles
+    
+    return {
+        "miles": distance_miles,
+        "km": distance_km
     }
