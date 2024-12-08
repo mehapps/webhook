@@ -1,7 +1,7 @@
 from json import loads as load_json
 from requests import get as requests_get, post as requests_post
 from datetime import datetime, timezone
-from config.db import messages_collection
+from config.db import messages_collection, locations_collection
 from fastapi import FastAPI, Request, HTTPException
 from pytz import timezone as pytz_timezone
 from models.arr import JellyseerrData, ProwlarrData, RadarrData, SonarrData
@@ -284,7 +284,68 @@ async def uptime_kuma(data: UptimeKuma):
 
 @app.post("/custom-webhook")
 async def custom_webhook(data: CustomData):
-    if data.room_id != None:
+    if data.room_id is not None:
         send_chat(data.message, data.room_id)
     else:
         send_chat(data.message, MATRIX_ID)
+
+@app.get("/bluebubbles-location/{handle}")
+async def location_request(handle: str):
+    past_location = await locations_collection.find_one({"handle": handle})
+    if past_location is not None and past_location.get("last_updated") is not None:
+        last_updated = past_location["last_updated"] / 1000
+        last_updated_time = datetime.fromtimestamp(last_updated, tz=timezone.utc)
+        current_time = datetime.now(tz=timezone.utc)
+        if (current_time - last_updated_time).total_seconds() <= 60:
+            print("less than a minute")
+            return {
+                "latitude": past_location["location"][0],
+                "longitude": past_location["location"][1],
+                "last_updated": past_location["last_updated"]
+                }
+    
+    url = f"{BB_ADDRESS}/api/v1/icloud/findmy/friends?password={BB_PASSWORD}"
+    request = requests_get(url)
+    json_data = request.json()
+
+    data = json_data.get("data")
+    latitude = None
+    longitude = None
+    last_updated = None
+
+    if data == None:
+        raise HTTPException(status_code=504, detail="Data not found")
+    
+    for person in data:
+        person_handle = person.get("handle")
+        if handle == person_handle:
+            coordinates = person.get("coordinates")
+            latitude = coordinates[0]
+            longitude = coordinates[1]
+            last_updated = person.get("last_updated")
+
+    if latitude == None or longitude == None:
+        raise HTTPException(status_code=400, detail="Invalid handle")
+
+    
+    if past_location is None:
+        document = {
+            "handle": handle,
+            "location": [latitude, longitude],
+            "last_updated": last_updated
+        }
+        await locations_collection.insert_one(document)
+    else:
+        await locations_collection.update_one(
+            {"handle": handle},
+            {"$set": {
+                "location": [latitude, longitude],
+                "last_updated": last_updated
+            }}
+        )
+    
+    return {
+        "latitude": latitude,
+        "longitude": longitude,
+        "last_updated": last_updated
+    }

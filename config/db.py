@@ -7,3 +7,4 @@ load_dotenv()
 client = AsyncIOMotorClient(getenv("ATLAS_URI"))
 db = client["Webhook"]
 messages_collection = db["Messages"]
+locations_collection = db["Locations"]
