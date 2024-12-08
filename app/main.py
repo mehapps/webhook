@@ -69,7 +69,6 @@ async def send_chat(message, room_id):
 
 @app.post("/bluebubbles-webhook")
 async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
-    print(data)
     if request.headers.get("Content-Type") != "application/json":
         raise HTTPException(status_code=400, detail="Invalid Content-Type")
 
@@ -84,15 +83,15 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
             if self_message:
                 return {"status": "ignored"}
 
-            sender_handle = message_data.handle.address
+            sender_handle = message_data.handle.get("address")
 
             conversation = await messages_collection.find_one({"sender_handle": sender_handle})
             
-            if "chat" in message_data.chats[0].chatIdentifier:
+            if message_data.get("chats") is not None and "chat" in message_data.get("chats")[0].get("chatIdentifier"):
                 group_chat = True
             else:
                 group_chat = False
-
+            
             if not conversation:
                 await messages_collection.insert_one({
                     "sender_handle": sender_handle,
@@ -130,7 +129,7 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
             message_guid = message_data.guid
             message_text = message_data.text
             date_unsent = message_data.dateEdited
-            sender_handle = message_data.handle.address
+            sender_handle = message_data.handle.get("address")
 
             conversation = await messages_collection.find_one({"sender_handle": sender_handle})
 
