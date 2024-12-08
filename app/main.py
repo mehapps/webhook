@@ -75,19 +75,19 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
     match data.type:
         case 'new-message':
             message_data = data.data
-            message_guid = message_data.guid
-            message_text = message_data.text
-            date_created = message_data.dateCreated
-            self_message = message_data.isFromMe
+            message_guid = message_data.get("guid")
+            message_text = message_data.get("guid")
+            date_created = message_data.get("guid")
+            self_message = message_data.get("guid")
 
             if self_message:
                 return {"status": "ignored"}
 
-            sender_handle = message_data.handle.get("address")
+            sender_handle = message_data.get("handle").get("address")
 
             conversation = await messages_collection.find_one({"sender_handle": sender_handle})
             
-            if message_data.chats is not None and "chat" in message_data.chats[0].get("chatIdentifier"):
+            if message_data.get("chats") is not None and "chat" in message_data["chats"][0].get("chatIdentifier"):
                 group_chat = True
             else:
                 group_chat = False
@@ -121,15 +121,15 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
 
         case "updated-message":
             message_data = data.data
-            self_message = message_data.isFromMe
+            self_message = message_data.get("isFromMe")
 
             if self_message:
                 return {"status": "ignored"}
             
-            message_guid = message_data.guid
-            message_text = message_data.text
-            date_unsent = message_data.dateEdited
-            sender_handle = message_data.handle.get("address")
+            message_guid = message_data.get("guid")
+            message_text = message_data.get("text")
+            date_unsent = message_data.get("dateEdited")
+            sender_handle = message_data.get("handle").get("address")
 
             conversation = await messages_collection.find_one({"sender_handle": sender_handle})
 
