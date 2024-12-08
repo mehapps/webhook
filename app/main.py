@@ -188,6 +188,7 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
             return {"status": "ok"}
 
         case _:
+            print(data)
             raise HTTPException(status_code=400, detail="Unknown event type")
 
 @app.post("/jellyseerr-webhook")
