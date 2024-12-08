@@ -12,6 +12,7 @@ from models.uptime import UptimeKuma
 from dotenv import load_dotenv
 from os import getenv
 from re import sub
+from geopy.distance import geodesic
 
 load_dotenv()
 
@@ -374,4 +375,41 @@ async def location_request(handle: str):
         "latitude": latitude,
         "longitude": longitude,
         "last_updated": last_updated
+    }
+    
+#distance between person and me
+@app.get("/bluebubbles-distance")
+async def person_distance(handle: str = "", id: str = ""):
+    handle_location = await location_request(handle)
+    if handle_location is None:
+        raise HTTPException(status_code=400, detail="Invalid handle")
+    
+    handle_latitude = handle_location.get("latitude")
+    handle_longitude = handle_location.get("longitude")
+    handle_coordinates = (handle_latitude, handle_longitude)
+    
+    url = f"{BB_ADDRESS}/api/v1/icloud/findmy/devices?password={BB_PASSWORD}"
+    request = requests_get(url)
+    json_data = request.json()
+    data = json_data.get("data")
+
+    for device in data:
+        name = device.get("name")
+        if name == id:
+            location = device.get("location")
+            latitude = location.get("latitude")
+            longitude = location.get("longitude")
+        
+    if latitude is None or longitude is None:
+        raise HTTPException(status_code=400, detail="Invalid device")
+    
+    my_coordinates = (latitude, longitude)
+                
+    distance = geodesic(handle_coordinates, my_coordinates)
+    distance_km = distance.km
+    distance_miles = distance.miles
+    
+    return {
+        "miles": distance_miles,
+        "km": distance_km
     }
