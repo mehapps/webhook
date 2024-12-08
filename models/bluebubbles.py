@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from typing import List, Optional, Dict
 
 
@@ -20,22 +20,21 @@ class Chats(BaseModel):
 
 
 class Data(BaseModel):
+    originalROWID: Optional[int] = None
     guid: Optional[str] = None
     text: Optional[str] = None
-    dateCreated: Optional[int] = None
-    dateEdited: Optional[int] = None
-    isFromMe: Optional[bool] = None
-    handle: Optional[Handle] = None
-    originalROWID: Optional[int] = None
     attributedBody: Optional[str] = None
+    handle: Optional[Handle] = None
     handleId: Optional[int] = None
     otherHandle: Optional[int] = None
     attachments: Optional[List[Dict]] = None
     subject: Optional[str] = None
     error: Optional[int] = None
+    dateCreated: Optional[int] = None
     dateRead: Optional[int] = None
     dateDelivered: Optional[int] = None
     isDelivered: Optional[bool] = None
+    isFromMe: Optional[bool] = None
     hasDdResults: Optional[bool] = None
     isArchived: Optional[bool] = None
     itemType: Optional[int] = None
@@ -50,6 +49,7 @@ class Data(BaseModel):
     chats: Optional[List[Chats]] = None
     messageSummaryInfo: Optional[Dict] = None
     payloadData: Optional[Dict] = None
+    dateEdited: Optional[int] = None
     dateRetracted: Optional[int] = None
     partCount: Optional[int] = None
 
