@@ -69,6 +69,7 @@ async def send_chat(message, room_id):
 
 @app.post("/bluebubbles-webhook")
 async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
+    print(data)
     if request.headers.get("Content-Type") != "application/json":
         raise HTTPException(status_code=400, detail="Invalid Content-Type")
 
