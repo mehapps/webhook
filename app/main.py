@@ -297,7 +297,7 @@ async def location_request(handle: str):
         last_updated_time = datetime.fromtimestamp(last_updated, tz=timezone.utc)
         current_time = datetime.now(tz=timezone.utc)
         if (current_time - last_updated_time).total_seconds() <= 60:
-            print("less than a minute")
+            print("less than a minute", (current_time - last_updated_time).total_seconds())
             return {
                 "latitude": past_location["location"][0],
                 "longitude": past_location["location"][1],
