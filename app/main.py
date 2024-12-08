@@ -72,7 +72,7 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
     if request.headers.get("Content-Type") != "application/json":
         raise HTTPException(status_code=400, detail="Invalid Content-Type")
 
-    match data.type:
+    match data.get("type"):
         case 'new-message':
             message_data = data.data
             message_guid = message_data.get("guid")
@@ -187,8 +187,10 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
 
             return {"status": "ok"}
 
-        case _:
+        case "new-findmy-location":
             print(data)
+
+        case _:
             raise HTTPException(status_code=400, detail="Unknown event type")
 
 @app.post("/jellyseerr-webhook")
