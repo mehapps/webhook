@@ -189,7 +189,7 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
             return {"status": "ok"}
 
         case "new-findmy-location":
-            handle = data.data.get("handle"
+            handle = data.data.get("handle")
             past_location = await locations_collection.find_one({"handle": handle},
                                                                 {"_id": 1})
             last_updated = data.data.get("last_updated")
