@@ -187,7 +187,35 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
                 )
 
             return {"status": "ok"}
+        
+        case "new-findmy-location":
+            handle = data.data.get("handle")
+            past_location = await locations_collection.find_one({"handle": handle},
+                                                                {"_id": 1})
+            last_updated = data.data.get("last_updated")
+            coordinates = data.data.get("coordinates")
+            latitude = coordinates[0]
+            longitude = coordinates[1]
 
+            if past_location is None:
+                document = {
+                    "handle": handle,
+                    "location": [latitude, longitude],
+                    "last_updated": last_updated
+                    }
+                await locations_collection.insert_one(document)
+            else:
+                await locations_collection.update_one(
+                    {"handle": handle},
+                    {"$set": {
+                        "location": [latitude, longitude],
+                        "last_updated": last_updated
+                        }
+                     }
+                    )
+
+            return {"status": "ok"}
+        
         case _:
             raise HTTPException(status_code=400, detail="Unknown event type")
 
