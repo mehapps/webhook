@@ -185,9 +185,8 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
                         "messages.$.timestamp": date_unsent
                     }}
                 )
-
             return {"status": "ok"}
-
+        
         case "new-findmy-location":
             handle = data.data.get("handle")
             past_location = await locations_collection.find_one({"handle": handle},
@@ -213,9 +212,9 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
                         }
                      }
                     )
-                
-            return {"status": "ok"}
 
+            return {"status": "ok"}
+        
         case _:
             raise HTTPException(status_code=400, detail="Unknown event type")
 
@@ -252,6 +251,10 @@ async def handle_jellyseerr_webhook(request: Request, data: JellyseerrData):
         case "MEDIA_AVAILABLE":
             media = data.subject
             message = f"{media} is now available"
+            await send_chat(message, MATRIX_ID)
+        case "MEDIA_APPROVED":
+            media = data.subject
+            message = f"{media} was approved"
             await send_chat(message, MATRIX_ID)
         case _:
             print(data)
@@ -322,6 +325,7 @@ async def custom_webhook(data: CustomData):
 async def location_request(handle: str):
     if len(handle) == 10:
         handle = AREA_CODE + handle
+    
     past_location = await locations_collection.find_one({"handle": handle})
     if past_location is not None and past_location.get("last_updated") is not None:
         last_updated = past_location["last_updated"] / 1000
@@ -331,7 +335,8 @@ async def location_request(handle: str):
             return {
                 "latitude": past_location["location"][0],
                 "longitude": past_location["location"][1],
-                "last_updated": past_location["last_updated"]
+                "last_updated": past_location["last_updated"],
+                "mongodb": True
                 }
     
     url = f"{BB_ADDRESS}/api/v1/icloud/findmy/friends?password={BB_PASSWORD}"
@@ -376,22 +381,24 @@ async def location_request(handle: str):
     return {
         "latitude": latitude,
         "longitude": longitude,
-        "last_updated": last_updated
+        "last_updated": last_updated,
+        "mongodb": False
     }
-    
+
 @app.get("/bluebubbles-distance")
 async def person_distance(handle: str = "", id: str = ""):
     if len(handle) == 10:
         handle = AREA_CODE + handle
+        
     handle_location = await location_request(handle)
-    print(handle_location)
     if handle_location is None:
         raise HTTPException(status_code=400, detail="Invalid handle")
     
     handle_latitude = handle_location.get("latitude")
     handle_longitude = handle_location.get("longitude")
+    mongodb = handle_location.get("mongodb")
     handle_coordinates = (handle_latitude, handle_longitude)
-    
+
     url = f"{BB_ADDRESS}/api/v1/icloud/findmy/devices?password={BB_PASSWORD}"
     request = requests_get(url)
     json_data = request.json()
@@ -408,12 +415,13 @@ async def person_distance(handle: str = "", id: str = ""):
         raise HTTPException(status_code=400, detail="Invalid device")
     
     my_coordinates = (latitude, longitude)
-                
+
     distance = geodesic(handle_coordinates, my_coordinates)
     distance_km = distance.km
     distance_miles = distance.miles
-    
+
     return {
         "miles": distance_miles,
-        "km": distance_km
+        "km": distance_km,
+        "mongodb": mongodb
     }
