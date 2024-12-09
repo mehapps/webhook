@@ -292,6 +292,9 @@ async def custom_webhook(data: CustomData):
 
 @app.get("/bluebubbles-location/{handle}")
 async def location_request(handle: str):
+    if len(handle) == 10:
+        handle = AREA_CODE + handle
+    
     past_location = await locations_collection.find_one({"handle": handle})
     if past_location is not None and past_location.get("last_updated") is not None:
         last_updated = past_location["last_updated"] / 1000
@@ -352,6 +355,9 @@ async def location_request(handle: str):
 
 @app.get("/bluebubbles-distance")
 async def person_distance(handle: str = "", id: str = ""):
+    if len(handle) == 10:
+        handle = AREA_CODE + handle
+        
     handle_location = await location_request(handle)
     if handle_location is None:
         raise HTTPException(status_code=400, detail="Invalid handle")
