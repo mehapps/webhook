@@ -185,7 +185,6 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
                         "messages.$.timestamp": date_unsent
                     }}
                 )
-
             return {"status": "ok"}
         
         case "new-findmy-location":
