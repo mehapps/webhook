@@ -213,7 +213,7 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
                         }
                      }
                     )
-                print("location updated")
+                print("location updated", latitude, longitude)
                 
             return {"status": "ok"}
 
