@@ -225,6 +225,10 @@ async def handle_jellyseerr_webhook(request: Request, data: JellyseerrData):
             media = data.subject
             message = f"{media} is now available"
             await send_chat(message, MATRIX_ID)
+        case "MEDIA_APPROVED":
+            media = data.subject
+            message = f"{media} was approved"
+            await send_chat(message, MATRIX_ID)
         case _:
             print(data)
             await send_chat("Something just happened within Jellyseerr, check logs!", MATRIX_ID)
