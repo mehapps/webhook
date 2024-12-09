@@ -359,7 +359,7 @@ async def person_distance(handle: str = "", id: str = ""):
     handle_latitude = handle_location.get("latitude")
     handle_longitude = handle_location.get("longitude")
     handle_coordinates = (handle_latitude, handle_longitude)
-    print(handle_coordinates)
+
     url = f"{BB_ADDRESS}/api/v1/icloud/findmy/devices?password={BB_PASSWORD}"
     request = requests_get(url)
     json_data = request.json()
@@ -376,11 +376,11 @@ async def person_distance(handle: str = "", id: str = ""):
         raise HTTPException(status_code=400, detail="Invalid device")
     
     my_coordinates = (latitude, longitude)
-    print(my_coordinates)
+
     distance = geodesic(handle_coordinates, my_coordinates)
     distance_km = distance.km
     distance_miles = distance.miles
-    print(distance_miles)
+
     return {
         "miles": distance_miles,
         "km": distance_km
