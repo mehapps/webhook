@@ -305,7 +305,8 @@ async def location_request(handle: str):
             return {
                 "latitude": past_location["location"][0],
                 "longitude": past_location["location"][1],
-                "last_updated": past_location["last_updated"]
+                "last_updated": past_location["last_updated"],
+                "mongodb": True
                 }
     
     url = f"{BB_ADDRESS}/api/v1/icloud/findmy/friends?password={BB_PASSWORD}"
@@ -350,7 +351,8 @@ async def location_request(handle: str):
     return {
         "latitude": latitude,
         "longitude": longitude,
-        "last_updated": last_updated
+        "last_updated": last_updated,
+        "mongodb": False
     }
 
 @app.get("/bluebubbles-distance")
@@ -364,6 +366,7 @@ async def person_distance(handle: str = "", id: str = ""):
     
     handle_latitude = handle_location.get("latitude")
     handle_longitude = handle_location.get("longitude")
+    mongodb = handle_location.get("mongodb")
     handle_coordinates = (handle_latitude, handle_longitude)
 
     url = f"{BB_ADDRESS}/api/v1/icloud/findmy/devices?password={BB_PASSWORD}"
@@ -389,5 +392,6 @@ async def person_distance(handle: str = "", id: str = ""):
 
     return {
         "miles": distance_miles,
-        "km": distance_km
+        "km": distance_km,
+        "mongodb": mongodb
     }
