@@ -404,7 +404,7 @@ async def person_distance(handle: str = "", id: str = ""):
         raise HTTPException(status_code=400, detail="Invalid device")
     
     my_coordinates = (latitude, longitude)
-                
+    
     distance = geodesic(handle_coordinates, my_coordinates)
     distance_km = distance.km
     distance_miles = distance.miles
