@@ -332,7 +332,7 @@ async def location_request(handle: str):
                 "last_updated": past_location["last_updated"]
                 }
     
-    url = f"{BB_ADDRESS}/api/v1/icloud/findmy/friends?password={BB_PASSWORD}"
+    url = f"{BB_ADDRESS}/api/v1/icloud/findmy/friends/refresh?password={BB_PASSWORD}"
     request = requests_get(url)
     json_data = request.json()
 
