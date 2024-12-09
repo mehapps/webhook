@@ -335,7 +335,7 @@ async def location_request(handle: str):
                 }
     
     url = f"{BB_ADDRESS}/api/v1/icloud/findmy/friends/refresh?password={BB_PASSWORD}"
-    request = requests_get(url)
+    request = requests_post(url)
     print(request.text)
     json_data = request.json()
 
