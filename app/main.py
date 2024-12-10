@@ -196,6 +196,11 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
             coordinates = data.data.get("coordinates")
             latitude = coordinates[0]
             longitude = coordinates[1]
+            
+            if (latitude is None or longitude is None 
+                or latitude == 0 or longitude == 0):
+                print(latitude, longitude)
+                raise HTTPException(status_code=422, detail="Invalid latitude/longitude")
 
             if past_location is None:
                 document = {
