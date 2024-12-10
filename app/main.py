@@ -192,6 +192,7 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
             past_location = await locations_collection.find_one({"handle": handle},
                                                                 {"_id": 1})
             last_updated = data.data.get("last_updated")
+            long_address = data.data.get("long_address")
             coordinates = data.data.get("coordinates")
             latitude = coordinates[0]
             longitude = coordinates[1]
@@ -200,15 +201,21 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
                 document = {
                     "handle": handle,
                     "location": [latitude, longitude],
-                    "last_updated": last_updated
+                    "last_updated": last_updated,
+                    "long_address": long_address
                     }
                 await locations_collection.insert_one(document)
             else:
+                if past_location["long_address"] != long_address and past_location["location"] == coordinates:
+                    url = f"{BB_ADDRESS}/api/v1/server/restart/soft?password={BB_PASSWORD}"
+                    requests_get(url)
+                    
                 await locations_collection.update_one(
                     {"handle": handle},
                     {"$set": {
                         "location": [latitude, longitude],
-                        "last_updated": last_updated
+                        "last_updated": last_updated,
+                        "long_address": long_address
                         }
                      }
                     )
@@ -327,6 +334,8 @@ async def location_request(handle: str):
         handle = AREA_CODE + handle
     
     past_location = await locations_collection.find_one({"handle": handle})
+
+    
     if past_location is not None and past_location.get("last_updated") is not None:
         last_updated = past_location["last_updated"] / 1000
         last_updated_time = datetime.fromtimestamp(last_updated, tz=timezone.utc)
@@ -336,6 +345,7 @@ async def location_request(handle: str):
                 "latitude": past_location["location"][0],
                 "longitude": past_location["location"][1],
                 "last_updated": past_location["last_updated"],
+                "long_address": past_location["long_address"],
                 "mongodb": True
                 }
     
@@ -347,6 +357,7 @@ async def location_request(handle: str):
     latitude = None
     longitude = None
     last_updated = None
+    long_address = None
 
     if data == None:
         raise HTTPException(status_code=504, detail="Data not found")
@@ -355,18 +366,20 @@ async def location_request(handle: str):
         person_handle = person.get("handle")
         if handle == person_handle:
             coordinates = person.get("coordinates")
+            if coordinates == None:
+                raise HTTPException(status_code=400, detail="Invalid handle")
+            
             latitude = coordinates[0]
             longitude = coordinates[1]
             last_updated = person.get("last_updated")
-
-    if latitude == None or longitude == None:
-        raise HTTPException(status_code=400, detail="Invalid handle")
+            long_address = person.get("long_address")
 
     if past_location is None:
         document = {
             "handle": handle,
             "location": [latitude, longitude],
-            "last_updated": last_updated
+            "last_updated": last_updated,
+            "long_address": long_address
         }
         await locations_collection.insert_one(document)
     else:
@@ -374,7 +387,8 @@ async def location_request(handle: str):
             {"handle": handle},
             {"$set": {
                 "location": [latitude, longitude],
-                "last_updated": last_updated
+                "last_updated": last_updated,
+                "long_address": long_address
             }}
         )
     
@@ -382,6 +396,7 @@ async def location_request(handle: str):
         "latitude": latitude,
         "longitude": longitude,
         "last_updated": last_updated,
+        "long_address": long_address,
         "mongodb": False
     }
 
