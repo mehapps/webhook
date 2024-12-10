@@ -211,7 +211,8 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
                     }
                 await locations_collection.insert_one(document)
             else:
-                if past_location["long_address"] != long_address and past_location["location"] == coordinates:
+                if ("long_address" in past_location and past_location["long_address"] != long_address
+                    and past_location["location"] == coordinates):
                     url = f"{BB_ADDRESS}/api/v1/server/restart/soft?password={BB_PASSWORD}"
                     requests_get(url)
                     
