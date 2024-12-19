@@ -442,7 +442,7 @@ async def person_distance(handle: str = "", id: str = ""):
     distance_miles = distance.miles
 
     return {
-        "miles": distance_miles,
-        "km": distance_km,
+        "miles": round(distance_miles, 2),
+        "km": round(distance_km, 2),
         "mongodb": mongodb
     }
