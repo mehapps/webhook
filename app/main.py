@@ -94,6 +94,7 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
                 group_chat = False
             
             if not conversation:
+                print("line 97, storing")
                 await messages_collection.insert_one({
                     "sender_handle": sender_handle,
                     "messages": [
@@ -106,7 +107,9 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
                         }
                     ]
                 })
+                print("line 110, should be stored")
             else:
+                print("line 112, storing")
                 await messages_collection.update_one(
                     {"sender_handle": sender_handle},
                     {"$push": {"messages": {
@@ -117,6 +120,7 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
                         "group_chat": group_chat
                     }}}
                 )
+                print("line 123, should be stored")
 
             return {"status": "ok"}
 
