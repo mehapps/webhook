@@ -78,11 +78,12 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
             print("new message")
             message_data = data.data
             message_guid = message_data.get("guid")
-            message_text = message_data.get("guid")
-            date_created = message_data.get("guid")
-            self_message = message_data.get("guid")
+            message_text = message_data.get("text")
+            date_created = message_data.get("dateCreated")
+            self_message = message_data.get("isFromMe")
 
             if self_message:
+                print("self message, ignoring")
                 return {"status": "ignored"}
 
             sender_handle = message_data.get("handle").get("address")
