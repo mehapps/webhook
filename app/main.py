@@ -75,6 +75,7 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
 
     match data.type:
         case 'new-message':
+            print("new message")
             message_data = data.data
             message_guid = message_data.get("guid")
             message_text = message_data.get("guid")
