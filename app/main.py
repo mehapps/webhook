@@ -81,7 +81,7 @@ async def handle_bluebubbles_webhook(request: Request, data: BluebubblesData):
             message_text = message_data.get("text")
             date_created = message_data.get("dateCreated")
             self_message = message_data.get("isFromMe")
-
+            print(message_text)
             if self_message:
                 print("self message, ignoring")
                 return {"status": "ignored"}
